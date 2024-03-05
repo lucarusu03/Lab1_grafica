@@ -8,6 +8,8 @@ Programul afiseaza un patrat pe care il translateaza pe axa x la apasarea sageti
 #include "glaux.h"
 
 static GLfloat x = 0;
+static GLfloat y = 0;
+static GLfloat rot_z = 0;
 
 void myInit() {
     glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -23,27 +25,38 @@ void CALLBACK MutaDreapta()
     x = x + 10;
 }
 
+void CALLBACK rot_z_up(AUX_EVENTREC* event)
+{
+    rot_z += 90;
+}
+
+void CALLBACK rot_z_down(AUX_EVENTREC* event)
+{
+    rot_z -= 90;
+}
+
 void CALLBACK display()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glLoadIdentity();
 
-    glTranslatef(x, 0, 0.0);
-
+    glTranslatef(x, y, 0.0);
+    //Roteste figura la un unghi alfa
+    glRotatef(rot_z, 0, 0, 1);
     glBegin(GL_QUADS);
     {
         glColor3f(1.0, 0.0, 0.0);
-        glVertex2f(100, 100);
+        glVertex2f(-100, -100);
         glColor3f(1.0, 1.0, 0.0);
-        glVertex2f(150.0, 100.0);
+        glVertex2f(100.0, -100.0);
         glColor3f(0.0, 0.0, 1.0);
-        glVertex2f(150.0, 150.0);
+        glVertex2f(100.0, 100.0);
         glColor3f(0.0, 1.0, 0.0);
-        glVertex2f(100.0, 150.0);
+        glVertex2f(-100.0, 100.0);
     }
     glEnd();
-
+    
     glFlush();
 }
 
@@ -77,6 +90,8 @@ void CALLBACK myReshape(GLsizei w, GLsizei h)
 }
 #endif
 
+
+
 int main(int argc, char** argv)
 {
     auxInitDisplayMode(AUX_SINGLE | AUX_RGB);
@@ -85,7 +100,9 @@ int main(int argc, char** argv)
     myInit();
     auxKeyFunc(AUX_LEFT, MutaStanga);
     auxKeyFunc(AUX_RIGHT, MutaDreapta);
-
+    
+    auxMouseFunc(AUX_LEFTBUTTON, AUX_MOUSEDOWN, rot_z_down);
+    auxMouseFunc(AUX_RIGHTBUTTON, AUX_MOUSEDOWN, rot_z_up);
     auxReshapeFunc(myReshape);
     auxMainLoop(display);
     return(0);
